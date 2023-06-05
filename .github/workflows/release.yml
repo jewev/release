@@ -11,10 +11,7 @@ jobs:
       - name: get-id
         id: get_id
         run: |
-          # TMP_DIRECTORY="$(mktemp -d)"
-          # RELEASE_LATEST="$(curl -IkLs -o ${TMP_DIRECTORY}/NUL -w %{url_effective} ${{ secrets.SOURCE_VERSION }} | grep -o "[^/]*$")"
           RELEASE_LATEST="$(curl -IkLs -o /tmp/NUL -w %{url_effective} ${{ secrets.SOURCE_VERSION }} | grep -o "[^/]*$")"
-          # RELEASE_LATEST="v${RELEASE_LATEST#v}"
           echo "ID=v${RELEASE_LATEST#v}" >> $GITHUB_OUTPUT
       - name: checkout
         uses: actions/checkout@v3
@@ -36,10 +33,8 @@ jobs:
         run: go mod download
       - name: release
         run: | 
-          mkdir -p buildx
           CGO_ENABLED=0 go build -o release -trimpath -ldflags "-s -w -buildid=" ./main
-          ln  release buildx/
-          zip -9vr release.zip buildx
+          zip -9vr release.zip release
       - name: Install minisign and sign
         run: |
           sudo apt-get -y install libsodium-dev
