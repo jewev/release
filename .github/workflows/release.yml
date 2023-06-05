@@ -46,12 +46,12 @@ jobs:
           /tmp/bin/minisign -v
           echo "${{ secrets.MINISIGN_SK }}" >> /tmp/minisign.key
           echo | /tmp/bin/minisign -s /tmp/minisign.key -Sm *.zip
-      - name: Upload files to Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: release
-          path: |
-            ./release.zip*
+      # - name: Upload files to Artifacts
+        # uses: actions/upload-artifact@v3
+        # with:
+          # name: release
+          # path: |
+            # ./release.zip*
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
