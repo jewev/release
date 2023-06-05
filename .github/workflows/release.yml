@@ -37,13 +37,10 @@ jobs:
       - name: release
         run: | 
           mkdir -p buildx
-          # CGO_ENABLED=0 go build -o buildx/release -trimpath -ldflags "-s -w -buildid=" ./main
-          CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -buildid=" ./main
-          # pushd buildx || exit 1
-          ln release buildx/
-          # zip -9vr ../release.zip .
-          zip -9vr ../release.zip buildx
-          # popd || exit 1
+          CGO_ENABLED=0 go build -o buildx/release -trimpath -ldflags "-s -w -buildid=" ./main
+          pushd buildx || exit 1
+          zip -9vr ../release.zip .
+          popd || exit 1
       - name: Install minisign and sign
         run: |
           sudo apt-get -y install libsodium-dev
@@ -55,14 +52,13 @@ jobs:
           /tmp/bin/minisign -v
           echo "${{ secrets.MINISIGN_SK }}" >> /tmp/minisign.key
           echo | /tmp/bin/minisign -s /tmp/minisign.key -Sm *.zip
-          # mv buildx release
+          mv buildx release
       - name: Upload files to Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: release
           path: |
-            # ./release/*
-            ./release.zip*
+            ./release/*
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
